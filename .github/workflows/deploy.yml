@@ -1,0 +1,77 @@
+name: Deploy to Google Cloud
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: django-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Configure Docker for Google Container Registry
+      run: gcloud auth configure-docker
+
+    - name: Build Backend Docker Image
+      run: |
+        cd backend
+        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
+        docker tag gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+
+    - name: Push Backend Image to Container Registry
+      run: |
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+
+    - name: Deploy Backend to Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:latest \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated \
+          --port 8080 \
+          --memory 512Mi \
+          --cpu 1 \
+          --min-instances 0 \
+          --max-instances 10 \
+          --set-env-vars DJANGO_SETTINGS_MODULE=myapp_conf.settings_prod \
+          --set-env-vars SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" \
+          --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+          --add-cloudsql-instances ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
+
+    - name: Build Frontend
+      run: |
+        cd frontend/myapp_front
+        npm ci
+        npm run build
+
+    - name: Deploy Frontend to Cloud Storage
+      run: |
+        cd frontend/myapp_front
+        gsutil -m rsync -r -d build gs://${{ secrets.FRONTEND_BUCKET }}
+        gsutil iam ch allUsers:objectViewer gs://${{ secrets.FRONTEND_BUCKET }}
+        gsutil web set -m index.html -e index.html gs://${{ secrets.FRONTEND_BUCKET }}
+
+    - name: Get Backend URL
+      run: |
+        BACKEND_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
+        echo "Backend deployed to: $BACKEND_URL"
+        echo "Frontend deployed to: https://storage.googleapis.com/${{ secrets.FRONTEND_BUCKET }}/index.html"
