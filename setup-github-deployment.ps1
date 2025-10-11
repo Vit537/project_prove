@@ -57,10 +57,12 @@ foreach ($role in $roles) {
         --role="$role"
 }
 
-# Create service account key
-Write-Host "🔑 Creating service account key..." -ForegroundColor Yellow
+# Create service account key (LOCAL ONLY - NOT COMMITTED TO GIT)
+Write-Host "🔑 Creating service account key (LOCAL FILE ONLY)..." -ForegroundColor Yellow
 gcloud iam service-accounts keys create github-actions-key.json `
     --iam-account=$serviceAccountEmail
+
+Write-Host "⚠️  SECURITY NOTE: github-actions-key.json created locally and ignored by git" -ForegroundColor Red
 
 # Create Cloud SQL instance
 Write-Host "🗄️ Creating Cloud SQL PostgreSQL database..." -ForegroundColor Yellow
@@ -139,7 +141,7 @@ Write-Host "git add . && git commit -m 'Deploy to production' && git push origin
 Write-Host ""
 Write-Host "Watch deployment at: https://github.com/Vit537/project_prove/actions" -ForegroundColor Yellow
 
-# Save configuration for reference
+# Save configuration for reference (LOCAL ONLY - NOT COMMITTED TO GIT)
 @"
 # Deployment Configuration
 Project: $PROJECT_ID
@@ -150,13 +152,16 @@ Connection Name: $connectionName
 Frontend Bucket: $FRONTEND_BUCKET
 Service Account: $serviceAccountEmail
 
-# Database Credentials
+# Database Credentials (SENSITIVE - LOCAL ONLY)
 Root Password: $rootPassword
 User Password: $userPassword
 Django Secret: $djangoSecret
 
 # GitHub Repository: https://github.com/Vit537/project_prove
 # Add secrets at: https://github.com/Vit537/project_prove/settings/secrets/actions
+
+# SECURITY NOTE: This file contains sensitive information and is ignored by git
 "@ | Out-File -FilePath "deployment-config.txt" -Encoding UTF8
 
-Write-Host "📄 Configuration saved to: deployment-config.txt" -ForegroundColor Green
+Write-Host "📄 Configuration saved to: deployment-config.txt (LOCAL ONLY)" -ForegroundColor Green
+Write-Host "⚠️  These files contain sensitive data and are ignored by git for security" -ForegroundColor Red
