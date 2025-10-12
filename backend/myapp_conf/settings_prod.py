@@ -10,12 +10,21 @@ from .settings import *
 DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY')
 
+# Tell Django it is behind a proxy that forwards HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 # Allowed hosts for Google Cloud Run
 ALLOWED_HOSTS = [
     '.run.app',  # Google Cloud Run domains
     '.googleapis.com',
     'localhost',
     '127.0.0.1',
+]
+
+# Trust Cloud Run domains for CSRF (needed for admin and cookie/session flows)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.run.app',
 ]
 
 # CORS settings for production
