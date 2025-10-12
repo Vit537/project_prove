@@ -27,24 +27,29 @@ jobs:
     - name: Set up Google Cloud CLI
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: Configure Docker for Google Container Registry
-      run: gcloud auth configure-docker
+    # Configure Docker to authenticate with Artifact Registry for the selected region
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker $REGION-docker.pkg.dev
 
+    # Build using Artifact Registry image path
     - name: Build Backend Docker Image
       run: |
         cd backend
-        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
-        docker tag gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+        IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/backend/$SERVICE_NAME"
+        docker build -t "$IMAGE:${{ github.sha }}" .
+        docker tag "$IMAGE:${{ github.sha }}" "$IMAGE:latest"
 
-    - name: Push Backend Image to Container Registry
+    - name: Push Backend Image to Artifact Registry
       run: |
-        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
-        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+        IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/backend/$SERVICE_NAME"
+        docker push "$IMAGE:${{ github.sha }}"
+        docker push "$IMAGE:latest"
 
     - name: Deploy Backend to Cloud Run
       run: |
+        IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/backend/$SERVICE_NAME:latest"
         gcloud run deploy $SERVICE_NAME \
-          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:latest \
+          --image "$IMAGE" \
           --platform managed \
           --region $REGION \
           --allow-unauthenticated \
