@@ -5,17 +5,19 @@ echo "🔄 Esperando a que la base de datos esté lista..."
 python << END
 import sys
 import time
+import os
 import psycopg2
 from urllib.parse import urlparse
 
 def wait_for_db():
-    db_url = "$DATABASE_URL"
+    db_url = os.getenv("DATABASE_URL")
     result = urlparse(db_url)
     username = result.username
     password = result.password
     database = result.path[1:]
     hostname = result.hostname
     port = result.port
+    print(db_url)
 
     max_retries = 30
     retry_count = 0

@@ -2,8 +2,7 @@ FROM python:3.11-slim
 
 # Variables de entorno
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8000
+    PYTHONDONTWRITEBYTECODE=1
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
@@ -31,8 +30,8 @@ RUN chmod +x /app/entrypoint.sh
 # Crear directorio para archivos estáticos
 RUN mkdir -p /app/staticfiles
 
-# Exponer puerto
-EXPOSE 8000
+# Exponer puerto (será definido por Cloud Run)
+EXPOSE $PORT
 
 # Usar el entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]
