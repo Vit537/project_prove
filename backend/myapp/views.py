@@ -9,6 +9,12 @@ from rest_framework import status
 from .models import Person
 from .serializers import PersonSerializer
 
+@api_view(['GET'])
+def list_people(request):
+    people = Person.objects.all()
+    serializer = PersonSerializer(people, many=True)
+    return Response(serializer.data)    
+
 @api_view(['POST'])
 def create_person(request):
     serializer = PersonSerializer(data=request.data)
