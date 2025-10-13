@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "🔄 Esperando a que la base de datos esté lista..."
-python << END
+# Verificar si DATABASE_URL está configurado antes de intentar conectar
+if [ -n "$DATABASE_URL" ]; then
+    echo "🔄 Esperando a que la base de datos esté lista..."
+    python << END
 import sys
 import time
 import os
@@ -44,6 +46,9 @@ def wait_for_db():
 
 wait_for_db()
 END
+else
+    echo "ℹ️  DATABASE_URL no configurado, saltando verificación de base de datos"
+fi
 
 echo "🔄 Ejecutando migraciones..."
 python manage.py migrate --noinput
