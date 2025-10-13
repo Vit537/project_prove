@@ -66,4 +66,5 @@ jobs:
     - name: Get Backend URL
       run: |
         BACKEND_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
-        echo "Backend deployed to: $BACKEND_URL"
+        echo "✅ Backend deployed to: $BACKEND_URL"
+        echo "🎉 Deployment successful!"
