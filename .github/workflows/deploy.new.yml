@@ -35,6 +35,9 @@ jobs:
     - name: Build Backend Docker Image
       run: |
         cd backend
+        cp Dockerfile.new Dockerfile
+        cp entrypoint.new.sh entrypoint.sh
+        chmod +x entrypoint.sh
         IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/backend/$SERVICE_NAME"
         docker build -t "$IMAGE:${{ github.sha }}" .
         docker tag "$IMAGE:${{ github.sha }}" "$IMAGE:latest"
