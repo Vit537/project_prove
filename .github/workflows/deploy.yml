@@ -67,6 +67,7 @@ jobs:
       run: |
         cd frontend/myapp_front
         echo "REACT_APP_API_URL=https://django-backend-930184937279.us-central1.run.app" > .env.production
+        echo "PUBLIC_URL=https://storage.googleapis.com/myproject-frontend-bucket-unique" >> .env.production
         npm ci
         npm run build
 
