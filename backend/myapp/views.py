@@ -9,16 +9,18 @@ from rest_framework import status
 from .models import Person
 from .serializers import PersonSerializer
 
-@api_view(['GET'])
-def list_people(request):
-    people = Person.objects.all()
-    serializer = PersonSerializer(people, many=True)
-    return Response(serializer.data)    
-
-@api_view(['POST'])
-def create_person(request):
-    serializer = PersonSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET', 'POST'])
+def person_view(request):
+    if request.method == 'GET':
+        # Listar todas las personas
+        people = Person.objects.all()
+        serializer = PersonSerializer(people, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        # Crear nueva persona
+        serializer = PersonSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
