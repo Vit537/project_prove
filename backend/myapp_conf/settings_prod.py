@@ -30,9 +30,17 @@ CSRF_TRUSTED_ORIGINS = [
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
     config('FRONTEND_URL', default='http://localhost:3000'),
+    'https://storage.googleapis.com',
+    'https://myproject-frontend-bucket-unique.storage.googleapis.com',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# También permitir todos los orígenes de Google Storage para desarrollo
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.storage\.googleapis\.com$",
+]
 
 # Database configuration using Cloud SQL
 DATABASES = {

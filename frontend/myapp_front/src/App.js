@@ -32,7 +32,8 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/person/', {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const response = await axios.post(`${API_URL}/api/person/`, {
         name,
         date,
       });

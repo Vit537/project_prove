@@ -63,8 +63,21 @@ jobs:
           --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL }}" \
           --add-cloudsql-instances ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
 
-    - name: Get Backend URL
+    - name: Build Frontend
+      run: |
+        cd frontend/myapp_front
+        echo "REACT_APP_API_URL=https://django-backend-930184937279.us-central1.run.app" > .env.production
+        npm ci
+        npm run build
+
+    - name: Deploy Frontend to Cloud Storage
+      run: |
+        cd frontend/myapp_front
+        gcloud storage rsync --recursive --delete-unmatched-destination-objects build gs://myproject-frontend-bucket-unique
+
+    - name: Get Deployment URLs
       run: |
         BACKEND_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
         echo "✅ Backend deployed to: $BACKEND_URL"
-        echo "🎉 Deployment successful!"
+        echo "✅ Frontend deployed to: https://storage.googleapis.com/myproject-frontend-bucket-unique/index.html"
+        echo "🎉 Deployment completed successfully!"
