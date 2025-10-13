@@ -71,8 +71,8 @@ function App() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>📝 My Django + React App</h1>
-      <p>Conectado con el backend en Google Cloud Run</p>
+      <h1>📝 My Django + React App v2</h1>
+      <p>Conectado con el backend en Google Cloud Run ✅</p>
       
       {/* Formulario para agregar nuevos datos */}
       <div style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
