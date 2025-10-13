@@ -16,6 +16,7 @@ def wait_for_db():
     database = result.path[1:]
     hostname = result.hostname
     port = result.port
+    print(db_url)
 
     max_retries = 30
     retry_count = 0
