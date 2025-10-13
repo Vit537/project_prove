@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Iniciando aplicación Django v2..."
+echo "🚀 Iniciando aplicación Django..."
 
 # Verificar si DATABASE_URL está configurado antes de intentar conectar
 if [ -n "$DATABASE_URL" ]; then

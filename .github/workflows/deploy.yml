@@ -74,6 +74,10 @@ jobs:
       run: |
         cd frontend/myapp_front
         gcloud storage rsync --recursive --delete-unmatched-destination-objects build gs://myproject-frontend-bucket-unique
+        
+    - name: Set Public Access for Frontend
+      run: |
+        gcloud storage buckets add-iam-policy-binding gs://myproject-frontend-bucket-unique --member=allUsers --role=roles/storage.objectViewer
 
     - name: Get Deployment URLs
       run: |
