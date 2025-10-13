@@ -22,7 +22,7 @@ import "./App.css";
 //   );
 // }
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 function App() {
@@ -33,8 +33,8 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-  // Función para cargar datos del backend
-  const loadPeople = async () => {
+  // Función para cargar datos del backend (memoizada)
+  const loadPeople = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/person/`);
       setPeople(response.data);
@@ -43,12 +43,12 @@ function App() {
       console.error('Error loading people:', error);
       setLoading(false);
     }
-  };
+  }, [API_URL]);
 
   // Cargar datos al iniciar la aplicación
   useEffect(() => {
     loadPeople();
-  }, []);
+  }, [loadPeople]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
